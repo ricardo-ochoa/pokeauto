@@ -1,15 +1,17 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { Autocomplete, TextField, Typography, Box, Grid, Chip, Avatar, CardMedia, Button, IconButton, Zoom } from '@mui/material';
 import TuneIcon from '@mui/icons-material/Tune';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
+import { Filter } from '../components/ui';
 
 import { MainLayout } from '../components/Layouts'
 
 import styles from '../styles/Home.module.css'
 import 'animate.css';
-import React from 'react';
+import SimpleDialogDemo from '../components/ui/Filter';
+
 
 
 export interface PokemonListResponse {
@@ -45,14 +47,16 @@ export default function Home() {
   const [pokemonsByColor, setPokemonsByColor ] = useState<IPokemonColor[]>( [] );
   const [currentColor, setCurrentColor ] = useState('https://pokeapi.co/api/v2/pokemon-color/');
 
-  const [back, setBack ] = useState<string | null>( null );
-  const [next, setNext ] = useState<string | null>( null );
+  const [back, setBack ] = useState<RequestInfo | URL>( '' );
+  const [next, setNext ] = useState<RequestInfo | URL>( '' );
 
   
   const [current, setCurrent ] = useState<RequestInfo | URL>('https://pokeapi.co/api/v2/pokemon?limit=5&offset=0');
   const [genders, setGenders ] = useState('https://pokeapi.co/api/v2/gender/');
 
   const [active, setActive ] = useState( 0 );
+
+  const [ open, setOpen] = useState(false)
 
 
 
@@ -188,14 +192,20 @@ export default function Home() {
           alignItems:'end', position:'absolute', maxWidth:'1200px', width:'100%', padding:'1rem' }}>
             <Box display='flex' width='100%' justifyContent='space-between'>
                 <img src="../pokeapi_256.png" width="126px" height='51'/>
-                <Button sx={{ width:"106px" }} size="large" variant="outlined" startIcon={<TuneIcon />}>
+                <Button onClick={() => setOpen( true ) } sx={{ width:"106px" }} size="large" variant="outlined" startIcon={<TuneIcon />}>
                 Filters
                 </Button>
+
+
+                <Filter open={open} selectedValue={'Hola Mundo'} onClose={function (value: string): void {
+                  setOpen( false )
+                } } />
+
             </Box>
 
             <Box display='flex' flexDirection='column' width='fit-content' justifyContent='flex-end' zIndex="tooltip">
-              <Chip label="Deletable" onDelete={handleDelete} sx={{ marginBottom:'6px'}} />
-              <Chip label="Deletable" onDelete={handleDelete} sx={{ marginBottom:'6px'}}/>
+              {/* <Chip label="Deletable" onDelete={handleDelete} sx={{ marginBottom:'6px'}} />
+              <Chip label="Deletable" onDelete={handleDelete} sx={{ marginBottom:'6px'}}/> */}
             </Box>
       </nav>
 
@@ -217,7 +227,7 @@ export default function Home() {
                                     component="img"
                                     sx={{ width: "100%", filter: "drop-shadow(0px 10px 10px rgba(0, 0, 0, 0.5))", objectFit:'fill' }}
                                     image={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${poke.id}.png`}
-                                    //image={ active.img2 }
+                                    //image={ }
                                     //image="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/9061.png"
                                     alt={poke.name}
                                 />
@@ -295,4 +305,3 @@ export default function Home() {
     </div>
   )
 }
-
