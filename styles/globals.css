@@ -8,9 +8,10 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   
     background: linear-gradient(180deg, #1e1e1e63 0%, #44516986 100%);
+    background-color: linear-gradient(180deg, #1e1e1e63 0%, #44516986 100%)!important;
+
     background-repeat: no-repeat;
-    color: rgb(255, 255, 255);
-    background-color: linear-gradient(180deg, #1e1e1e63 0%, #44516986 100%);
+    color: #fff!important;
 }
 
 a {
