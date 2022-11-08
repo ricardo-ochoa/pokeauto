@@ -3,7 +3,7 @@ import { Box, CardMedia, Typography, IconButton, Grid } from '@mui/material'
 
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import { IPokemonClean } from '../../pages';
+import { IPokemonClean } from '../../interfaces';
 
 
 
