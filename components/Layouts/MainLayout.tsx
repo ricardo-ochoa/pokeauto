@@ -60,7 +60,7 @@ export const MainLayout:FC<Props> = ({ children, title, pageDescription, imageFu
             </main>
 
             <Box className="video-container">
-                <video autoPlay muted loop className="video" >
+                <video autoPlay muted className="video" >
                     <source src="https://res.cloudinary.com/dnxxkvpiz/video/upload/v1667886984/ochoagram/bg_viewfinder_nutqg2.mp4" type="video/mp4"/>
                 </video>
             </Box>

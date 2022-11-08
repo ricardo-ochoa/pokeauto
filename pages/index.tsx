@@ -17,41 +17,27 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 
 export default function Home() {
 
-  const [pokemonsApi, setPokemonsApi ] = useState<IPokemonClean[]>( [] );
+  const [pokemonsApi, setPokemonsApi ] = useState<number>( 0 );
   const [pokemons, setPokemons ] = useState<IPokemonClean[]>( [] );
-  const [active, setActive ] = useState( 0 );
+  
+  
 
   const [ open, setOpen] = useState(false)
   const [ valueColor, setValuecolor ] = useState('')
 
-  const [back, setBack ] = useState<RequestInfo | URL>( '' );
-  const [next, setNext ] = useState<RequestInfo | URL>( '' );
-  const [current, setCurrent ] = useState<RequestInfo | URL>('https://pokeapi.co/api/v2/pokemon?limit=5&offset=0');
+  // const [back, setBack ] = useState<RequestInfo | URL>( '' );
+  // const [next, setNext ] = useState<RequestInfo | URL>( '' );
 
-
-  const [colorId, setColorId ] = useState( 1 );
-  const [pokemonsByColor, setPokemonsByColor ] = useState<IPokemonColor[]>( [] );
-  const [currentColor, setCurrentColor ] = useState(`https://pokeapi.co/api/v2/pokemon-color`);
-
-  const [pokemonsByGenderDos, setPokemonsByGenderDos ] = useState<IPokemonColor[]>( [] );
-  const [pokemonsByGender, setPokemonsByGender ] = useState<IPokemonColor[]>( [] );
-  const [currentGender, setCurrentGender ] = useState('https://pokeapi.co/api/v2/gender');
-
+  const [back, setBack ] = useState<number>( 0  );
+  const [next, setNext ] = useState<number>( 5 );
+  const [active, setActive ] = useState( back );
+  const [current, setCurrent ] = useState<RequestInfo | URL>(`https://pokeapi.co/api/v2/pokemon-color/pink`);
 
 
   const [genders, setGenders ] = useState('https://pokeapi.co/api/v2/gender/');
 
-
   const [allPokes, setAllPokes ] = useState<RequestInfo | URL >('https://pokeapi.co/api/v2/pokemon?limit=500&offset=0')
-  const [pokemonscol, setPokemonscol ] = useState<IPokemonFiltered[] | void[]>( [] );
-  // -> 
-  const [newArrayPokes, setNewArrayPokes ] = useState<IPokemonFiltered[] | void[]>( [] );
 
-  const [pokes, setPokes ] = useState<IPokemonFiltered[] | void[]>( [] );
-
-  const [gender, setGender] = useState<string>(() => '2');
-
-  // const [pokeMains, setPokeMains] = useLocalStorage('pokelist', '') 
 
   const getPokemons = async () => {
     try {
@@ -77,59 +63,64 @@ export default function Home() {
     }
   }
 
-
   const mainPokemons = ( id: React.SetStateAction<number>, type: string ) => {
     setActive( id )
   }
 
   const nextPage = () => {
-    next !== null && setCurrent( next )
-     setActive(0)
+    setNext(next + 5)
+    setBack(back + 5) 
+
   }
 
   const backPage = () => {
-    next !== null && setCurrent( back )
+    next === 5 ? setNext(5) : setNext(next - 5)
+    back === 0 ? setBack(0) : setBack(back - 5)
+
+    console.log( next, back, pokemonsApi)
+
   }
 
   const reedLocalStorage = () => {
     
-    if( localStorage.getItem("pokelist") ){
+
       let pokelist = JSON.parse( localStorage.getItem('pokelist') as string )
-      setPokemons(pokelist)
-    }
+      setCurrent(pokelist)
+
   }
 
   const fetchPokemons= async () => {
     try {
       const data = await getPokemons();
 
-      setNext( data.next );
-      setBack( data.previous );
+      // setNext( data.next );
+      // setBack( data.previous );
+      
 
-      setPokemonsApi( data.count )
-
-      const promises = data.results.map(async (pokemon: { url: any; }) => {
+      const promises = data.pokemon_species.map(async (pokemon: { url: any; }) => {
         return await getPokemonsData( pokemon.url)
       })
 
       const results = await Promise.all(promises)
      
       setPokemons( results )
-
+      setPokemonsApi( results.length )
 
     } catch( error ) {}
   }
 
 
   useEffect(() => {
-    fetchPokemons()
-    localStorage.setItem( 'pokelist', JSON.stringify( pokemons ) );
+    setActive(back)
+  }, [next, back])
 
+
+  useEffect(() => {
+    fetchPokemons();
+    localStorage.setItem( 'current', JSON.stringify( current ) );
   }, [ current ])
 
   useEffect(() => {
-
-    
 
   }, [  ])
 
@@ -163,9 +154,7 @@ export default function Home() {
             </Box>
       </nav>
 
-
-
-      <Grid container className='animate__animated animate__zoomInDown animate-duration_2s animate__delay-2s'>
+      <Grid container className='animate__animated animate__zoomInDown animate-duration_2s animate__delay-1s'>
         <Grid item xs={ 12 } >
         <>
       { 
@@ -216,21 +205,21 @@ export default function Home() {
                                 <Typography variant='subtitle1'  textAlign='center'  marginRight={1}>ID:</Typography>
                                     <Typography variant='h6'  textAlign='center' fontWeight={800} marginRight={1}>{poke.id}</Typography>
                                     <Typography variant='subtitle2'  textAlign='center'  marginRight={1}>/</Typography>
-                                    <Typography variant='subtitle2'  textAlign='center'>{ pokemonsApi as any }</Typography>
+                                    <Typography variant='subtitle2'  textAlign='center'>All pokemons: { pokemonsApi as any }</Typography>
                                 </Box>
                            
                           </Box>
 
                         <Box maxWidth='350px' width='100%' display='flex' alignItems='center' justifyContent='space-between' marginBottom='1rem' marginTop='1rem'>
                                 {
-                                pokemons.map((poke) =>(
+                                pokemons.slice(back, next).map((poke) =>(
                                         <CardMedia
                                         
                                         className='thumbs animate__animated animate__swing'
                                         onClick={() => mainPokemons( pokemons.indexOf(poke), `https://pokeapi.co/api/v2/type/${ poke.id }`  )}
                                         key={poke.name}
                                         component="img"
-                                        image={poke.sprites.other.home.front_default }
+                                        image={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${ poke.id }.png`}
                                         sx={{width: "50px", maxHeight:'50px',borderRadius:'100px',filter: pokemons.indexOf(poke) === active ? "drop-shadow(0px 10px 10px rgba(50, 70, 0, 1))": 'none', objectFit:'fill', cursor:'pointer'}}
                                         />
                                         ))
@@ -238,11 +227,11 @@ export default function Home() {
                         </Box>
 
                         <Box maxWidth={'450px'} width='100%' display='flex' alignItems='center' justifyContent='space-between' margin='0 auto'>
-                          <IconButton onClick={()=> backPage() } aria-label="back" size="large" sx={{ backgroundColor: '#ffffff29' }}>
+                          <IconButton disabled={ back > 0 ? false : true } onClick={()=> backPage() } aria-label="back" size="large" sx={{ backgroundColor: '#ffffff29' }}>
                           <ArrowBackIcon fontSize="inherit" />
                           </IconButton>
 
-                          <IconButton onClick={()=> nextPage() } aria-label="next" size="large" sx={{ backgroundColor: '#ffffff29' }}>
+                          <IconButton disabled={ pokemonsApi <= next  ? true : false}  onClick={()=> nextPage() } aria-label="next" size="large" sx={{ backgroundColor: '#ffffff29' }}>
                           <ArrowForwardIcon fontSize="inherit" />
                           </IconButton>
                         </Box>
@@ -260,7 +249,6 @@ export default function Home() {
         </Grid>
       </Grid>
 
-      
       </>
     </MainLayout>
 

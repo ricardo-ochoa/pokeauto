@@ -37,7 +37,7 @@ export function Filter(props: SimpleDialogProps) {
   };
 
   return (
-    <Dialog onClose={handleClose} open={open}>
+    <Dialog onClose={handleClose} open={open} >
       <DialogTitle fontWeight={800}>General filters</DialogTitle>
       <Grid container sx={{ pt: 0 }} spacing={ 4 }>
         <Grid item padding={ 1 }>
@@ -91,6 +91,7 @@ export default function SimpleDialogDemo() {
   const handleClose = (value: string) => {
     setOpen(false);
     setSelectedValue(value);
+    console.log( value)
     
   };
 
