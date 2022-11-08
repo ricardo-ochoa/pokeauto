@@ -10,57 +10,81 @@ import { MainLayout } from '../components/Layouts'
 
 import styles from '../styles/Home.module.css'
 import 'animate.css';
-import SimpleDialogDemo from '../components/ui/Filter';
-
-
-
-export interface PokemonListResponse {
-  name: string;
-  results:   IPokemonClean[];
-}
-
-export interface IPokemonClean {
-  name: string;
-  id:   number;
-  type: string;
-  img?:  string;
-  img2?:  string;
-  img3?:  string;
-  sprites?: any;
-  count?: number;
-  color: IPokemonColor
-}
-
-export interface IPokemonColor {
-  pokemon_species: IPokemonClean;
-  id:   number;
-  name: string;
-}
-
+import { IPokemonClean, IPokemonColor, IPokemonFiltered } from '../interfaces/pokemon-list';
+import { ConstructionOutlined } from '@mui/icons-material';
 
 
 export default function Home() {
 
   const [pokemonsApi, setPokemonsApi ] = useState<IPokemonClean[]>( [] );
   const [pokemons, setPokemons ] = useState<IPokemonClean[]>( [] );
+  const [active, setActive ] = useState( 0 );
 
+  const [colorId, setColorId ] = useState( 1 );
   const [pokemonsByColor, setPokemonsByColor ] = useState<IPokemonColor[]>( [] );
-  const [currentColor, setCurrentColor ] = useState('https://pokeapi.co/api/v2/pokemon-color/');
+  const [currentColor, setCurrentColor ] = useState(`https://pokeapi.co/api/v2/pokemon-color`);
+
+  const [pokemonsByGenderDos, setPokemonsByGenderDos ] = useState<IPokemonColor[]>( [] );
+  const [pokemonsByGender, setPokemonsByGender ] = useState<IPokemonColor[]>( [] );
+  const [currentGender, setCurrentGender ] = useState('https://pokeapi.co/api/v2/gender');
 
   const [back, setBack ] = useState<RequestInfo | URL>( '' );
   const [next, setNext ] = useState<RequestInfo | URL>( '' );
 
-  
   const [current, setCurrent ] = useState<RequestInfo | URL>('https://pokeapi.co/api/v2/pokemon?limit=5&offset=0');
   const [genders, setGenders ] = useState('https://pokeapi.co/api/v2/gender/');
 
-  const [active, setActive ] = useState( 0 );
-
   const [ open, setOpen] = useState(false)
+  const [ valueColor, setValuecolor ] = useState('')
+
+  const [allPokes, setAllPokes ] = useState<RequestInfo | URL >('https://pokeapi.co/api/v2/pokemon?limit=500&offset=0')
+  const [pokemonscol, setPokemonscol ] = useState<IPokemonFiltered[] | void[]>( [] );
+  const [newArrayPokes, setNewArrayPokes ] = useState<IPokemonFiltered[] | void[]>( [] );
+
+  const [gender, setGender] = useState<string>(() => '2');
 
 
 
   
+  const getAllPokemons = async () => {
+    try {
+      let url = allPokes
+      const response = await fetch( url );
+      const data = await response.json();
+      
+      return data;
+      
+    } catch(err) {
+  
+    }
+  }
+
+  const getAllPokemonsData = async (url: RequestInfo | URL) => {
+    try {
+      const response = await fetch(url).then();
+      const data = await response.json();
+      return data 
+    } catch( error ){
+
+    }
+  }
+
+  const fetchAllPokemons= async () => {
+    try {
+      const data = await getAllPokemons();
+
+      const promises = data.results.map(async (pokemon: { url: any; }) => {
+        return await getAllPokemonsData( pokemon.url )
+      })
+
+      const results = await Promise.all(promises)
+      setPokemonscol( results );
+
+    } catch( error ) {}
+  }
+
+  //// Fetch Old //////////////////////
+
   const getPokemons = async () => {
     try {
       let url = current
@@ -72,9 +96,9 @@ export default function Home() {
     } catch(err) {
   
     }
-    }
+  }
 
-  const getPokemonsData = async (url) => {
+  const getPokemonsData = async (url: RequestInfo | URL) => {
     try {
       const response = await fetch(url);
       const data = await response.json();
@@ -99,54 +123,105 @@ export default function Home() {
       })
 
       const results = await Promise.all(promises)
+      localStorage.setItem( 'pokelist', JSON.stringify( results ) );
 
-      setPokemons(results)
-      
     } catch( error ) {}
   }
 
-  ///By COLOR  ///
-
-  const getPokemonsByColor = async () => {
-    try {
-      let url = currentColor
-      const response = await fetch(url);
-      const data = await response.json();
-      
-      return data;
-      
-    } catch(err) {
-  
-    }
-    }
-
-  const getPokemonsDataByColor = async (url) => {
-    try {
-      const response = await fetch( url );
-      const data = await response.json();
-      
-      return data;
-     
-    } catch( error ){}
-  }
-
-  const fetchPokemonsByColor= async () => {
-    try {
-      const data = await getPokemonsByColor();
-
-      const promises = data.results.map( async (color: { url: any; }) => {
-        return await getPokemonsDataByColor( color.url )
-      })
-
-      const results = await Promise.all(promises)
+  const reedLocalStorage = () => {
     
-      setPokemonsByColor(results)
-      
-    } catch( error ) {}
-  }
+    if( localStorage.getItem("pokelist") ){
 
+      let resultlist = JSON.parse( localStorage.getItem('pokelist') as string )
+    
+      setPokemons(resultlist)
+    }
+     else {
+      console.log('No hay lista de pokemons')
+    }
+  }
 
   ////////////////////
+  ///By Gender  ///
+
+    const getPokemonsByGender = async () => {
+      try {
+        let url = currentGender
+        const response = await fetch(url);
+        const data = await response.json();
+        
+        return data;
+        
+      } catch(err) {
+    
+      }
+    }
+  
+    const getPokemonsDataByGender = async (url: RequestInfo | URL) => {
+      try {
+        const response = await fetch( url );
+        const data = await response.json();
+        
+        return data;
+       
+      } catch( error ){}
+    }
+  
+    const fetchPokemonsByGender = async () => {
+      try {
+        const data = await getPokemonsByGender();
+  
+        const promises = data.results.map( async (gender: { url: any; }) => {
+          return await getPokemonsDataByGender( gender.url )
+        })
+  
+        const results = await Promise.all(promises)
+  
+        setPokemonsByGender(results)
+  
+        
+      } catch( error ) {}
+    }
+
+    ///////////////////// GENDER /////////////////////
+
+    const pokesGenderSpecies = async (): Promise<void> => {
+      setPokemonsByGenderDos([]);
+      const response = await fetch(`${currentGender}/${gender}/`);
+      const data = await response.json();
+     
+      setPokemonsByGender.pokemon_species_details?.forEach((item: any) => {
+        setPokemonsByGenderDos((prev) => [
+          ...prev,
+          {
+            name: item?.pokemon_species?.name,
+            url: item?.pokemon_species?.url,
+          },
+        ]);
+      });
+    };
+  
+    //////////////////// COLOR ///////////////////////
+
+    const pokesColorSpecies = async (): Promise<void> => {
+      setPokemonsByColor([]);
+      const response = await fetch(`${currentColor}/${colorId}/`);
+      const data = await response.json();
+    
+      setPokemonsByColor( data['pokemon_species'] )
+     
+      data['pokemon_species'].forEach((item: any) => {
+        setPokemonsByColor((prev) => [
+          ...prev,
+          {
+            name: item?.pokemon_species?.name,
+            url: item?.pokemon_species?.url,
+          },
+        ]);
+      });
+    };
+
+  ////////////////////////////////////////////////////////  
 
   const mainPokemons = ( id: React.SetStateAction<number>, type: string ) => {
     setActive( id )
@@ -155,32 +230,149 @@ export default function Home() {
   const nextPage = () => {
     next !== null && setCurrent( next )
      setActive(0)
+     
   }
 
   const backPage = () => {
     next !== null && setCurrent( back )
-    
   }
+
+  const newPokes = () => {
+
+    const newresults = pokemonscol.map( poke => poke.id || undefined )
+    const names = pokemonscol.map( poke => poke.name )
+
+    const color = pokemonsByColor.map( poke => poke[0] )
+    
+    const pokeGenders = pokemonsByGender.map( poke => poke.name )
+
+    // const fem = pokemonscol.map( poke => 'female' )
+    // const mal = pokemonscol.map( poke => 'male' )
+    const less = pokeGenders.map( poke => 
+                                          {
+      if( gender === "3"){
+        return 'Genderless'
+      } else if( gender === "2") {
+        return"Male"
+      } else {
+        return 'Female'
+      }
+    }
+      )
+
+    let pokemonsFilteredGenders = pokeGenders.map((name, index_value) => {
+      return {
+          name: name,
+          gender: less[index_value],
+      };
+  });
+////////////////////////////
+
+  const colors = pokemonsByColor.map( poke => 
+    {    
+      switch (colorId) {
+        case 1:
+          return 'Black';
+          break;
+        case 2:
+          return 'Blue'
+          break;
+        case 3:
+          return 'Brown';
+          break;
+        case 4:
+          return 'Gray'
+          break;
+        case 5:
+          return 'Green';
+          break;
+        case 6:
+          return 'Pink'
+          break;
+        case 7:
+          return 'Purple';
+          break;
+        case 8:
+          return 'Red'
+          break;
+        case 9:
+          return 'White';
+          break;
+        case 10:
+          return 'Yellow'
+          break;
+      
+        default:
+          break;
+      }
+      }
+    )
+
+  let pokemonsFilteredColor = pokemonsByColor.map((name, index_value) => {
+    return {
+        name: name.name,
+        color: colors[index_value],
+    };
+    });
+
+    console.log(pokemonsFilteredColor)
+    
+    let pokemonsFilteredGeneral = newresults.map((id, index_value) => {
+        return {
+            name: names[index_value],
+            id: id,
+            //color: color[index_value],
+            //gender: less[index_value],
+        };
+    });
+
+    setNewArrayPokes(pokemonsFilteredGeneral)
+
+  };
+
 
   useEffect(() => {
     getPokemons()
     fetchPokemons()
-    console.log( pokemonsByColor )
+    reedLocalStorage()
+
+    pokesColorSpecies()
+
+    newPokes()
+
+
   }, [ current ])
 
   useEffect(() => {
-    getPokemonsByColor()
-    fetchPokemonsByColor()
+    
+    //getPokemonsByColor()
+    //fetchPokemonsByColor()
+
+    getPokemonsByGender()
+    fetchPokemonsByGender()
+
+    // getAllPokemons()
+    //fetchAllPokemons()
+
+    // newPokes()
+
+    pokesGenderSpecies()
+
+
+    
+  
   }, [  ])
 
+  useEffect(() => {
+    
+    
+  }, [ valueColor ])
 
-  
-  
 
+  // const handleDelete = () => {
+  //     console.info('You clicked the delete icon.');
+  // };
 
-  const handleDelete = () => {
-      console.info('You clicked the delete icon.');
-  };
 
     
   return (
@@ -197,8 +389,8 @@ export default function Home() {
                 </Button>
 
 
-                <Filter open={open} selectedValue={'Hola Mundo'} onClose={function (value: string): void {
-                  setOpen( false )
+                <Filter open={open} selectedValue={ valueColor } onClose={function (value: string): void {
+                  setOpen( false ); setValuecolor( value ); 
                 } } />
 
             </Box>
@@ -222,7 +414,7 @@ export default function Home() {
                     { pokemons.map((poke) => (
                       pokemons.indexOf(poke) === active ? 
                       <>
-                          <Box key={ poke.id } className='animate__animated animate__pulse animate__delay-500s'  maxWidth='240px' width='100%' position="absolute" marginBottom="20rem" >
+                          <Box key={poke.id } className='animate__animated animate__pulse animate__delay-500s'  maxWidth='240px' width='100%' position="absolute" marginBottom="20rem" >
                                 <CardMedia
                                     component="img"
                                     sx={{ width: "100%", filter: "drop-shadow(0px 10px 10px rgba(0, 0, 0, 0.5))", objectFit:'fill' }}
@@ -254,16 +446,17 @@ export default function Home() {
                                         </Box>
                                 </Box>
 
-                                <Box display='flex' justifyContent='center' width='100%' marginTop='6px'> 
+                                <Box display='flex' justifyContent='center' alignItems='center' width='100%' marginTop='6px'> 
+                                <Typography variant='subtitle1'  textAlign='center'  marginRight={1}>ID:</Typography>
                                     <Typography variant='h6'  textAlign='center' fontWeight={800} marginRight={1}>{poke.id}</Typography>
-                                    <Typography variant='h6'  textAlign='center' fontWeight={800} marginRight={1}>/</Typography>
-                                    <Typography variant='h6'  textAlign='center'>{ pokemonsApi as any }</Typography>
+                                    <Typography variant='subtitle2'  textAlign='center'  marginRight={1}>/</Typography>
+                                    <Typography variant='subtitle2'  textAlign='center'>{ pokemonsApi as any }</Typography>
                                 </Box>
                            
                           </Box>
                       </>
                         :
-                        <div><span key={ poke.id}></span></div>
+                        <div><span></span></div>
                     ))
                     }
 
@@ -271,9 +464,9 @@ export default function Home() {
                                 {
                                 pokemons.map((poke) =>(
                                         <CardMedia
-                                        className='animate__animated animate__swing'
+                                        className='thumbs animate__animated animate__swing'
                                         onClick={() => mainPokemons( pokemons.indexOf(poke), `https://pokeapi.co/api/v2/type/${ poke.id }`  )}
-                                        key={poke.id}
+                                        key={poke.name}
                                         component="img"
                                         image={poke.sprites.other.home.front_default }
                                         sx={{ width: "50px", maxHeight:'50px',borderRadius:'100px',filter: "drop-shadow(0px 10px 10px rgba(0, 0, 0, 0.5))", objectFit:'fill', cursor:'pointer'}}
@@ -305,3 +498,5 @@ export default function Home() {
     </div>
   )
 }
+
+

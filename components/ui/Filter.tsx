@@ -42,7 +42,7 @@ export function Filter(props: SimpleDialogProps) {
       <Grid container sx={{ pt: 0 }} spacing={ 4 }>
         <Grid item padding={ 1 }>
         {colors.map((color) => (
-          <ListItem button onClick={() => handleListItemClick(color)} key={color}>
+          <ListItem button onClick={() => handleListItemClick(color)} key={colors.indexOf(color)}>
             <ListItemAvatar>
                 <Box bgcolor={ color } border='1px solid #ffffff' sx={{width:'40px', height:'40px', borderRadius:'100px' }}>
                     
@@ -54,7 +54,7 @@ export function Filter(props: SimpleDialogProps) {
         </Grid>
         <Grid item>
         {genders.map((gender) => (
-          <ListItem button onClick={() => handleListItemClick(gender)} key={gender}>
+          <ListItem button onClick={() => handleListItemClick(gender)} key={genders.indexOf(gender)}>
             <ListItemAvatar>
 
                     <Avatar sx={{ bgcolor: blue[100], color: "black" }}>
@@ -82,7 +82,7 @@ export function Filter(props: SimpleDialogProps) {
 
 export default function SimpleDialogDemo() {
   const [open, setOpen] = React.useState(false);
-  const [selectedValue, setSelectedValue] = React.useState(colors[1]);
+  const [selectedValue, setSelectedValue] = React.useState(colors[0]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -91,6 +91,7 @@ export default function SimpleDialogDemo() {
   const handleClose = (value: string) => {
     setOpen(false);
     setSelectedValue(value);
+    
   };
 
   return (
@@ -98,10 +99,7 @@ export default function SimpleDialogDemo() {
       <Typography variant="subtitle1" component="div">
         Selected: {selectedValue}
       </Typography>
-      <br />
-      <Button variant="outlined" onClick={handleClickOpen}>
-        Open simple dialog
-      </Button>
+
       <Filter
         selectedValue={selectedValue}
         open={open}
