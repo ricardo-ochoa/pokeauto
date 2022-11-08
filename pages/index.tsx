@@ -252,7 +252,7 @@ const fetchGenderPokemons= async () => {
                 ?
                 <></>
                 :
-                <Chip label={ color } onDelete={handleDelete} sx={{ marginBottom:'6px'}} />
+                <Chip color="secondary" label={ color } onDelete={handleDelete} sx={{ marginBottom:'6px'}} />
               }
               
             </Box>
