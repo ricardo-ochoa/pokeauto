@@ -46,12 +46,7 @@ a {
 }
 
 
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
 
-}
 
 .black {
   background-color: #121212;
