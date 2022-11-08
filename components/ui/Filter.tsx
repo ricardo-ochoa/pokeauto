@@ -16,7 +16,7 @@ import FemaleIcon from '@mui/icons-material/Female';
 import MinimizeIcon from '@mui/icons-material/Minimize';
 import MaleIcon from '@mui/icons-material/Male';
 
-const colors = ['Black', 'Blue', 'Brown', 'Gray', 'Green', 'Pink', 'Purple', 'Red', 'White', 'Yellow'];
+const colors = ['black', 'blue', 'brown', 'gray', 'green', 'pink', 'purple', 'red', 'white', 'yellow'];
 const genders = ['Male', 'Female', 'Genderless'];
 
 export interface SimpleDialogProps {
@@ -82,7 +82,7 @@ export function Filter(props: SimpleDialogProps) {
 
 export default function SimpleDialogDemo() {
   const [open, setOpen] = React.useState(false);
-  const [selectedValue, setSelectedValue] = React.useState(colors[0]);
+  const [selectedValue, setSelectedValue] = React.useState( "");
 
   const handleClickOpen = () => {
     setOpen(true);

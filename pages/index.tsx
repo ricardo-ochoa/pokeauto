@@ -31,7 +31,10 @@ export default function Home() {
   const [back, setBack ] = useState<number>( 0  );
   const [next, setNext ] = useState<number>( 5 );
   const [active, setActive ] = useState( back );
-  const [current, setCurrent ] = useState<RequestInfo | URL>(`https://pokeapi.co/api/v2/pokemon-color/pink`);
+
+  const [color, setColor] = useState( "" );
+  const [current, setCurrent ] = useState<RequestInfo | URL>(`https://pokeapi.co/api/v2/pokemon?limit=500&offset=0`);
+  const [allcurrent, setAllCurrent ] = useState<RequestInfo | URL>(`https://pokeapi.co/api/v2/pokemon?limit=500&offset=0`);
 
 
   const [genders, setGenders ] = useState('https://pokeapi.co/api/v2/gender/');
@@ -63,6 +66,57 @@ export default function Home() {
     }
   }
 
+  const fetchPokemons= async () => {
+    try {
+      const data = await getPokemons();
+
+      setNext( 5 )
+      setBack( 0 )
+
+      const promises = data.pokemon_species.map(async (pokemon: { url: any; }) => {
+        return await getPokemonsData( pokemon.url)
+      })
+
+      const results = await Promise.all(promises)
+     
+      setPokemons( results )
+      setPokemonsApi( results.length )
+
+    } catch( error ) {}
+  }
+
+///// All /////
+
+  const getAllPokemons = async () => {
+    try {
+      let url = allcurrent
+      const response = await fetch( url );
+      const data = await response.json();
+
+      return data;
+      
+    } catch(err) {
+  
+    }
+  }
+
+  const fetchAllPokemons= async () => {
+    try {
+      const data = await getPokemons();
+
+      const promises = data.results.map(async (pokemon: { url: any; }) => {
+        return await getPokemonsData( pokemon.url)
+      })
+
+      const results = await Promise.all(promises)
+     
+      setPokemons( results )
+      setPokemonsApi( results.length )
+
+    } catch( error ) {}
+  }
+
+
   const mainPokemons = ( id: React.SetStateAction<number>, type: string ) => {
     setActive( id )
   }
@@ -70,7 +124,6 @@ export default function Home() {
   const nextPage = () => {
     setNext(next + 5)
     setBack(back + 5) 
-
   }
 
   const backPage = () => {
@@ -89,25 +142,7 @@ export default function Home() {
 
   }
 
-  const fetchPokemons= async () => {
-    try {
-      const data = await getPokemons();
 
-      // setNext( data.next );
-      // setBack( data.previous );
-      
-
-      const promises = data.pokemon_species.map(async (pokemon: { url: any; }) => {
-        return await getPokemonsData( pokemon.url)
-      })
-
-      const results = await Promise.all(promises)
-     
-      setPokemons( results )
-      setPokemonsApi( results.length )
-
-    } catch( error ) {}
-  }
 
 
   useEffect(() => {
@@ -116,17 +151,24 @@ export default function Home() {
 
 
   useEffect(() => {
-    fetchPokemons();
+   //fetchPokemons();
     localStorage.setItem( 'current', JSON.stringify( current ) );
+  
   }, [ current ])
 
   useEffect(() => {
+    fetchPokemons();
+    fetchAllPokemons();
+    
+    console.log( back, next, pokemonsApi)
+    console.log( allcurrent )
+  }, [ current ])
 
-  }, [  ])
 
-  // const handleDelete = () => {
-  //     console.info('You clicked the delete icon.');
-  // };
+  const handleDelete = () => {
+      setCurrent(allcurrent)
+      setColor('')
+  };
 
   return (
     <div className={styles.container} >
@@ -142,19 +184,28 @@ export default function Home() {
                 </Button>
 
 
-                <Filter open={open} selectedValue={ valueColor } onClose={function (value: string): void {
-                  setOpen( false ); setValuecolor( value ); 
+                <Filter open={open} selectedValue={ '' }
+                  onClose={function (value: string): void {
+                      setColor( value  ); 
+                      setOpen( false );
+                      setCurrent(`https://pokeapi.co/api/v2/pokemon-color/${value}`)
                 } } />
 
             </Box>
 
             <Box display='flex' flexDirection='column' width='fit-content' justifyContent='flex-end' zIndex="tooltip">
-              {/* <Chip label="Deletable" onDelete={handleDelete} sx={{ marginBottom:'6px'}} />
-              <Chip label="Deletable" onDelete={handleDelete} sx={{ marginBottom:'6px'}}/> */}
+              {
+                color === ''
+                ?
+                <></>
+                :
+                <Chip label={ color } onDelete={handleDelete} sx={{ marginBottom:'6px'}} />
+              }
+              
             </Box>
       </nav>
 
-      <Grid container className='animate__animated animate__zoomInDown animate-duration_2s animate__delay-1s'>
+      <Grid container className='animate__animated animate__zoomInDown'>
         <Grid item xs={ 12 } >
         <>
       { 
@@ -205,7 +256,7 @@ export default function Home() {
                                 <Typography variant='subtitle1'  textAlign='center'  marginRight={1}>ID:</Typography>
                                     <Typography variant='h6'  textAlign='center' fontWeight={800} marginRight={1}>{poke.id}</Typography>
                                     <Typography variant='subtitle2'  textAlign='center'  marginRight={1}>/</Typography>
-                                    <Typography variant='subtitle2'  textAlign='center'>All pokemons: { pokemonsApi as any }</Typography>
+                                    <Typography variant='subtitle2'  textAlign='center'>All { color } pokemons: { pokemonsApi as any }</Typography>
                                 </Box>
                            
                           </Box>
