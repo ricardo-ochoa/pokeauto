@@ -216,7 +216,7 @@ const fetchGenderPokemons= async () => {
   return (
     <div className={styles.container} >
 
-    <MainLayout title={'PokeAuto'} pageDescription={'This is a Frontend test'} imageFullUrl={'https://res.cloudinary.com/dnxxkvpiz/image/upload/v1667940010/ochoagram/James-pokemon-guys-17827969-1280-720-4124311520_dca9t3.jpg'}> 
+    <MainLayout title={'PokeAuto'} pageDescription={'Front End Developer Skill Tests'} imageFullUrl={'https://res.cloudinary.com/dnxxkvpiz/image/upload/v1667940010/ochoagram/James-pokemon-guys-17827969-1280-720-4124311520_dca9t3.jpg'}> 
       <>
       <nav style={{ display:'flex', flexDirection:'column', justifyContent:'flex-end',
           alignItems:'end', position:'absolute', maxWidth:'1200px', width:'100%', padding:'1rem' }}>
