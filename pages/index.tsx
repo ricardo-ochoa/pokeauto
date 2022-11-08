@@ -268,7 +268,8 @@ const fetchGenderPokemons= async () => {
           <Box  flexDirection='column' display='flex' alignItems='center' justifyContent='center' m={2}>
             {/* <MainCard pokemons={pokemons} back={back} next={next} current={current} /> */}
             
-            <Box className='black' style={{ minHeight:"400px", margin: "15rem 0 0 0 ", top: "50%",left: "50%", borderRadius:'50px', maxWidth:'500px', width:'100%',
+
+            <Box style={{ backgroundColor: "#121212",border:"3px solid #000000", minHeight:"400px", margin: "15rem 0 0 0 ", top: "50%",left: "50%", borderRadius:'50px', maxWidth:'500px', width:'100%',
                     display:'flex', justifyContent:'flex-end', alignItems:' center', flexDirection:'column',
                     boxShadow: '0px 60px 71px -40px rgba(0, 0, 0, 0.4)', padding:'1rem' }}>
 
