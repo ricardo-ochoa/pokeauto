@@ -187,23 +187,7 @@ export default function Home() {
   //     } catch( error ) {}
   //   }
 
-  //   ///////////////////// GENDER /////////////////////
 
-  //   const pokesGenderSpecies = async (): Promise<void> => {
-  //     setPokemonsByGenderDos([]);
-  //     const response = await fetch(`${currentGender}/${gender}/`);
-  //     const data = await response.json();
-     
-  //     data?.pokemon_species_details?.forEach((item: any) => {
-  //       setPokemonsByGenderDos((prev) => [
-  //         ...prev,
-  //         {
-  //           name: item?.pokemon_species?.name,
-  //           url: item?.pokemon_species?.url,
-  //         },
-  //       ]);
-  //     });
-  //   };
   
   //   //////////////////// COLOR ///////////////////////
 

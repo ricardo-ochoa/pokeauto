@@ -17,7 +17,7 @@ import MinimizeIcon from '@mui/icons-material/Minimize';
 import MaleIcon from '@mui/icons-material/Male';
 
 const colors = ['black', 'blue', 'brown', 'gray', 'green', 'pink', 'purple', 'red', 'white', 'yellow'];
-const genders = ['Male', 'Female', 'Genderless'];
+const genders = ['male', 'female', 'genderless'];
 
 export interface SimpleDialogProps {
   open: boolean;

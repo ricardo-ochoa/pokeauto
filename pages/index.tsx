@@ -18,9 +18,7 @@ import { useLocalStorage } from '../hooks/useLocalStorage';
 export default function Home() {
 
   const [pokemonsApi, setPokemonsApi ] = useState<number>( 0 );
-  const [pokemons, setPokemons ] = useState<IPokemonClean[]>( [] );
-  
-  
+  const [pokemons, setPokemons ] = useState<IPokemonClean[]>( [] ); 
 
   const [ open, setOpen] = useState(false)
   const [ valueColor, setValuecolor ] = useState('')
@@ -34,14 +32,15 @@ export default function Home() {
 
   const [color, setColor] = useState( "" );
   const [current, setCurrent ] = useState<RequestInfo | URL>(`https://pokeapi.co/api/v2/pokemon?limit=500&offset=0`);
+
   const [allcurrent, setAllCurrent ] = useState<RequestInfo | URL>(`https://pokeapi.co/api/v2/pokemon?limit=500&offset=0`);
 
 
-  const [genders, setGenders ] = useState('https://pokeapi.co/api/v2/gender/');
+  // const [genders, setGenders ] = useState('https://pokeapi.co/api/v2/gender/');
 
-  const [allPokes, setAllPokes ] = useState<RequestInfo | URL >('https://pokeapi.co/api/v2/pokemon?limit=500&offset=0')
+  // const [allPokes, setAllPokes ] = useState<RequestInfo | URL >('https://pokeapi.co/api/v2/pokemon?limit=500&offset=0')
 
-
+////
   const getPokemons = async () => {
     try {
       let url = current
@@ -116,6 +115,52 @@ export default function Home() {
     } catch( error ) {}
   }
 
+///// Gender /////
+
+const getGendersPokemons = async () => {
+  try {
+    let url = current
+    const response = await fetch( url );
+    const data = await response.json();
+
+    
+    return data;
+    
+  } catch(err) {
+
+  }
+}
+
+const getPokemonsGenderData = async (url: RequestInfo | URL) => {
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    
+    return data
+  } catch( error ){
+
+  }
+}
+
+const fetchGenderPokemons= async () => {
+  try {
+    const data = await getPokemons();
+    
+
+    const promises = data.results.pokemon_species.pokemon_species_details.map(async (pokemon: { url: any; }) => {
+      return await getPokemonsData( pokemon.url)
+    })
+    
+   
+    const results = await Promise.all(promises)
+    console.log(promises)
+   
+    setPokemons( results )
+    setPokemonsApi( results.length )
+
+  } catch( error ) {}
+}
+
 
   const mainPokemons = ( id: React.SetStateAction<number>, type: string ) => {
     setActive( id )
@@ -134,13 +179,13 @@ export default function Home() {
 
   }
 
-  const reedLocalStorage = () => {
+  // const reedLocalStorage = () => {
     
 
-      let pokelist = JSON.parse( localStorage.getItem('pokelist') as string )
-      setCurrent(pokelist)
+  //     let pokelist = JSON.parse( localStorage.getItem('pokelist') as string )
+  //     setCurrent(pokelist)
 
-  }
+  // }
 
 
 
@@ -151,17 +196,15 @@ export default function Home() {
 
 
   useEffect(() => {
-   //fetchPokemons();
-    localStorage.setItem( 'current', JSON.stringify( current ) );
-  
-  }, [ current ])
+    if ( color != "" ){
+      fetchPokemons();
+      fetchGenderPokemons();
+    } else {
+      fetchAllPokemons();
+    }
 
-  useEffect(() => {
-    fetchPokemons();
-    fetchAllPokemons();
-    
-    console.log( back, next, pokemonsApi)
-    console.log( allcurrent )
+    console.log( color )
+
   }, [ current ])
 
 
@@ -188,7 +231,17 @@ export default function Home() {
                   onClose={function (value: string): void {
                       setColor( value  ); 
                       setOpen( false );
-                      setCurrent(`https://pokeapi.co/api/v2/pokemon-color/${value}`)
+
+                      if( value === 'male' ){
+                        setCurrent(`https://pokeapi.co/api/v2/gender/${value}`)
+                      } else if ( value === 'female' ){
+                        setCurrent(`https://pokeapi.co/api/v2/gender/${value}`)
+                      } else if ( value === 'genderless' ) {
+                        setCurrent(`https://pokeapi.co/api/v2/gender/${value}`)
+                      } else {
+                        setCurrent(`https://pokeapi.co/api/v2/pokemon-color/${value}`)
+                      }
+                      
                 } } />
 
             </Box>
@@ -256,7 +309,7 @@ export default function Home() {
                                 <Typography variant='subtitle1'  textAlign='center'  marginRight={1}>ID:</Typography>
                                     <Typography variant='h6'  textAlign='center' fontWeight={800} marginRight={1}>{poke.id}</Typography>
                                     <Typography variant='subtitle2'  textAlign='center'  marginRight={1}>/</Typography>
-                                    <Typography variant='subtitle2'  textAlign='center'>All { color } pokemons: { pokemonsApi as any }</Typography>
+                                    <Typography variant='subtitle2'  textAlign='center'>All {color} pokemons: { pokemonsApi as any }</Typography>
                                 </Box>
                            
                           </Box>
