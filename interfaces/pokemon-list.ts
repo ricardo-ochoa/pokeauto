@@ -31,6 +31,7 @@ export interface SmallPokemon {
     pokemon_species: IPokemonClean;
     id:   number;
     name: string;
+    sprites?: any;
     
   }
   
