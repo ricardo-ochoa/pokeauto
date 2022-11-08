@@ -59,10 +59,11 @@ export const MainLayout:FC<Props> = ({ children, title, pageDescription, imageFu
                 { children }
             </main>
 
-            <video autoPlay muted style={{ position: 'fixed', zIndex:'-2',
-            right: "0", bottom: "0", width:'100vw'  }}>
-                <source src="https://res.cloudinary.com/dnxxkvpiz/video/upload/v1667886984/ochoagram/bg_viewfinder_nutqg2.mp4" type="video/mp4"/>
-            </video>
+            <Box className="video-container">
+                <video autoPlay muted loop className="video" >
+                    <source src="https://res.cloudinary.com/dnxxkvpiz/video/upload/v1667886984/ochoagram/bg_viewfinder_nutqg2.mp4" type="video/mp4"/>
+                </video>
+            </Box>
 
 
 
