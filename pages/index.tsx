@@ -51,7 +51,7 @@ export default function Home() {
 
   const [gender, setGender] = useState<string>(() => '2');
 
-  //const [pokeMains, setPokeMains] = useLocalStorage('pokelist', '') 
+  // const [pokeMains, setPokeMains] = useLocalStorage('pokelist', '') 
 
   const getPokemons = async () => {
     try {
@@ -144,7 +144,7 @@ export default function Home() {
       <>
       <nav style={{ display:'flex', flexDirection:'column', justifyContent:'flex-end',
           alignItems:'end', position:'absolute', maxWidth:'1200px', width:'100%', padding:'1rem' }}>
-            <Box display='flex' width='100%' justifyContent='space-between'>
+            <Box zIndex="tooltip"  display='flex' width='100%' justifyContent='space-between'>
                 <img src="../pokeapi_256.png" width="126px" height='51'/>
                 <Button onClick={() => setOpen( true ) } sx={{ width:"106px" }} size="large" variant="outlined" startIcon={<TuneIcon />}>
                 Filters
@@ -165,7 +165,7 @@ export default function Home() {
 
 
 
-      <Grid container>
+      <Grid container className='animate__animated animate__zoomInDown animate-duration_2s animate__delay-2s'>
         <Grid item xs={ 12 } >
         <>
       { 

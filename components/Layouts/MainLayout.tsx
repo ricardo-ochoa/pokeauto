@@ -51,13 +51,21 @@ export const MainLayout:FC<Props> = ({ children, title, pageDescription, imageFu
             
         </Head>
 
-        <main className='main' style={{
-            margin: '0 auto',
-            maxWidth: '1200px',
-            
-        }}>
-            { children }
-        </main>
+            <main className='main' style={{
+                margin: '0 auto',
+                maxWidth: '1200px',
+                
+            }}>
+                { children }
+            </main>
+
+            <video autoPlay muted style={{ position: 'fixed', zIndex:'-2',
+            right: "0", bottom: "0", width:'100vw'  }}>
+                <source src="https://res.cloudinary.com/dnxxkvpiz/video/upload/v1667886984/ochoagram/bg_viewfinder_nutqg2.mp4" type="video/mp4"/>
+            </video>
+
+
+
 
 
     </div>
