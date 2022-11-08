@@ -7,7 +7,7 @@ body {
   font-family:  'Roboto', BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   
-    background: linear-gradient(180deg, #1e1e1e63 0%, #44516986 100%);
+    /* background: linear-gradient(180deg, #1e1e1e63 0%, #44516986 100%); */
     background-color: #1e1e1e18!important;
 
     background-repeat: no-repeat;
