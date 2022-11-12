@@ -1,4 +1,4 @@
-import React from 'react';
+import * as React from 'react';
 import Button from '@mui/material/Button';
 import Avatar from '@mui/material/Avatar';
 import List from '@mui/material/List';
@@ -11,10 +11,12 @@ import PersonIcon from '@mui/icons-material/Person';
 import AddIcon from '@mui/icons-material/Add';
 import Typography from '@mui/material/Typography';
 import { blue } from '@mui/material/colors';
-import { Box, Grid } from '@mui/material';
+import TuneIcon from '@mui/icons-material/Tune';
+import { Box, Chip, Grid } from '@mui/material';
 import FemaleIcon from '@mui/icons-material/Female';
 import MinimizeIcon from '@mui/icons-material/Minimize';
 import MaleIcon from '@mui/icons-material/Male';
+
 
 const colors = ['black', 'blue', 'brown', 'gray', 'green', 'pink', 'purple', 'red', 'white', 'yellow'];
 const genders = ['male', 'female', 'genderless'];
@@ -25,7 +27,7 @@ export interface SimpleDialogProps {
   onClose: (value: string) => void;
 }
 
-export function Filter(props: SimpleDialogProps) {
+function SimpleDialog(props: SimpleDialogProps) {
   const { onClose, selectedValue, open } = props;
 
   const handleClose = () => {
@@ -37,8 +39,8 @@ export function Filter(props: SimpleDialogProps) {
   };
 
   return (
-    <Dialog onClose={handleClose} open={open} color="secondary" >
-      <DialogTitle fontWeight={800}>General filters</DialogTitle>
+    <Dialog onClose={handleClose} open={open}>
+      <DialogTitle>Set backup account</DialogTitle>
       <Grid container sx={{ pt: 0 }} spacing={ 4 }>
         <Grid item padding={ 1 }>
         {colors.map((color) => (
@@ -80,9 +82,13 @@ export function Filter(props: SimpleDialogProps) {
   );
 }
 
-export default function SimpleDialogDemo() {
+export default function SimpleDialogDemo({ selectedValue, setSelectedValue }) {
   const [open, setOpen] = React.useState(false);
-  const [selectedValue, setSelectedValue] = React.useState( "");
+
+
+  const handleDelete = () => {
+    setSelectedValue("")
+};
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -90,22 +96,33 @@ export default function SimpleDialogDemo() {
 
   const handleClose = (value: string) => {
     setOpen(false);
-    setSelectedValue(value);
-    console.log( value)
-    
+    setSelectedValue(value)
+
+    console.log( value )
   };
 
   return (
-    <div>
-      <Typography variant="subtitle1" component="div">
-        Selected: {selectedValue}
-      </Typography>
+    <Box display='flex'  flexDirection='column' width='fit-content' justifyContent='flex-start' zIndex="tooltip">
+      <Button onClick={() => setOpen( true ) } sx={{ width:"106px" }} size="large" variant="outlined" startIcon={<TuneIcon />} >
+        Filter
+      </Button>
 
-      <Filter
+        <br />
+
+          {
+            selectedValue === ''
+            ?
+            <></>
+            :
+            <Chip color="secondary" label={ selectedValue } onDelete={handleDelete} sx={{ marginBottom:'6px'}} />
+          }
+
+      <SimpleDialog
         selectedValue={selectedValue}
         open={open}
         onClose={handleClose}
       />
-    </div>
+      
+    </Box>
   );
 }
