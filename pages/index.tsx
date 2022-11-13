@@ -1,165 +1,103 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Chip, Button } from '@mui/material';
+import { NextPage, GetStaticProps } from 'next';
+import { Box, Grid } from '@mui/material';
 import { NavBar, MainCard } from '../components/ui';
 import { MainLayout } from '../components/Layouts'
-import { IPokemonClean } from '../interfaces/pokemon-list';
+import { IPokemonClean, PokemonListResponse, SmallPokemon } from '../interfaces/pokemon-list';
 
 import 'animate.css';
 import styles from '../styles/Home.module.css'
+import { pokeApi } from '../ApiAxios';
+import { getPokemonInfo } from '../utils/getPokemonInfo';
 
-export default function Home() {
+interface Props {
+  pokemonsGeneral: SmallPokemon[];
+}
 
-  const [pokemonsApi, setPokemonsApi ] = useState<number>( 0 );
-  const [pokemons, setPokemons ] = useState<IPokemonClean[]>( [] ); 
+const Home: NextPage<Props> = ({ pokemonsGeneral }) => {
+
+  const [pokemons, setPokemons ] = useState<SmallPokemon[]>( pokemonsGeneral ); 
+  const [pokemonsApi, setPokemonsApi ] = useState<number>( pokemons.length );
+  
   const [ selectedValue, setSelectedValue ] = useState("");
+  const [current, setCurrent ] = useState('');
+
+  const [back, setBack ] = useState<number>( 0  );
+  const [next, setNext ] = useState<number>( 5 );
 
 
-  const [current, setCurrent ] = useState<RequestInfo | URL>(`https://pokeapi.co/api/v2/pokemon?limit=151&offset=0`);
-
-  const [allcurrent, setAllCurrent ] = useState<RequestInfo | URL>(`https://pokeapi.co/api/v2/pokemon?limit=500&offset=0`);
-
-
-////
-  const getPokemons = async () => {
+const getPokemons = async () => {
     try {
-      let url = current
-      const response = await fetch( url );
-      const data = await response.json();
+        let url = current
+        const { data } = await pokeApi.get( url );
 
       return data;
       
-    } catch(err) {
-  
-    }
-  }
+    } catch(err) {}
+}
 
-  const getPokemonsData = async (url: RequestInfo | URL) => {
+const getPokemonsData = async (url: RequestInfo | URL) => {
     try {
       const response = await fetch(url);
       const data = await response.json();
       
       return data;
-    } catch( error ){
+    } catch( error ){}
+}
 
-    }
-  }
-
-  const fetchPokemons= async () => {
+const fetchPokemons = async () => {
     try {
       const data = await getPokemons();
-      const promises = data.pokemon_species.map(async (pokemon: { url: any; }) => {
-        return await getPokemonsData( pokemon.url)
-      })
 
-      const results = await Promise.all(promises)
-      setPokemons( results )
-      setPokemonsApi( results.length )
-    } catch( error ) {}
-  }
-
-///// All /////
-
-  const getAllPokemons = async () => {
-    try {
-      let url = allcurrent
-      const response = await fetch( url );
-      const data = await response.json();
-
-      return data;
+      setNext( 5 )
+      setBack( 0 )
       
-    } catch(err) {
-  
-    }
-  }
+      if ( selectedValue === "" ) {
 
-  const fetchAllPokemons= async () => {
-    try {
-      const data = await getPokemons();
+        const promises = data.results.map( (poke, i) => ({
+          ...poke,
+          id: i + 1,
+          img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${ i + 1 }.png`,
+        }))
 
-      const promises = data.results.map(async (pokemon: { url: any; }) => {
-        return await getPokemonsData( pokemon.url)
-      })
+        const results = await Promise.all(promises)
+        setPokemons( results )
+        setPokemonsApi( results.length )
 
-      const results = await Promise.all(promises)
-     
-      setPokemons( results )
-      setPokemonsApi( results.length )
+      } else if ( selectedValue === 'male' || 'female' || 'genderless' ) {
+
+        const promises = data.pokemon_species_details.map(async (pokemon: { url: any; }) => {
+          return await getPokemonsData( pokemon.url)
+        })
+
+        const results = await Promise.all(promises)
+        setPokemons( results )
+        setPokemonsApi( results.length )
+
+      } else {
+
+        const promises = data.pokemon_species_details.map(async (pokemon: { url: any; }) => {
+          return await getPokemonsData( pokemon.url)
+        })
+
+        const results = await Promise.all(promises)
+        setPokemons( results )
+        setPokemonsApi( results.length )
+      }
 
     } catch( error ) {}
-  }
-
-///// Gender /////
-
-const getGendersPokemons = async () => {
-  try {
-    let url = current
-    const response = await fetch( url );
-    const data = await response.json();
-
-    
-    return data;
-    
-  } catch(err) {
-
-  }
 }
 
-const getPokemonsGenderData = async (url: RequestInfo | URL) => {
-  try {
-    const response = await fetch(url);
-    const data = await response.json();
-    
-    return data
-  } catch( error ){
 
-  }
-}
+useEffect(() => {
 
-const fetchGenderPokemons= async () => {
-  try {
-    const data = await getPokemons();
-    
+  getPokemons()
+  fetchPokemons()
 
-    const promises = data.results.pokemon_species.pokemon_species_details.map(async (pokemon: { url: any; }) => {
-      return await getPokemonsData( pokemon.url)
-    })
-    
-   
-    const results = await Promise.all(promises)
-   
-    setPokemons( results )
-    setPokemonsApi( results.length )
+  console.log( selectedValue, current )
 
-  } catch( error ) {}
-}
+}, [ selectedValue, current  ])
 
-  useEffect(() => {
-
-    if ( selectedValue != "" ){
-      fetchPokemons();
-      fetchGenderPokemons();
-    } else {
-      fetchAllPokemons();
-    }
-    
-  }, [ current, selectedValue ])
-
-  useEffect(() => {
-
-    if( selectedValue === 'male' ){
-      setCurrent(`https://pokeapi.co/api/v2/gender/${selectedValue}`)
-    } else if ( selectedValue === 'female' ){
-      setCurrent(`https://pokeapi.co/api/v2/gender/${selectedValue}`)
-    } else if ( selectedValue === 'genderless' ) {
-      setCurrent(`https://pokeapi.co/api/v2/gender/${selectedValue}`)
-    } else if ( selectedValue === '' ){
-      setCurrent(`https://pokeapi.co/api/v2/pokemon?limit=151&offset=0`)
-    } else {
-      setCurrent(`https://pokeapi.co/api/v2/pokemon-color/${selectedValue}`)
-    }
-
-  }, [ selectedValue ])
-  
 
   return (
     <Box className={styles.container} >
@@ -167,11 +105,43 @@ const fetchGenderPokemons= async () => {
       imageFullUrl={'https://res.cloudinary.com/dnxxkvpiz/image/upload/v1667940010/ochoagram/James-pokemon-guys-17827969-1280-720-4124311520_dca9t3.jpg'}> 
        
         <NavBar selectedValue={ selectedValue } setSelectedValue={ setSelectedValue } />
-        <MainCard pokemons={pokemons} pokemonsApi={pokemonsApi} selectedValue={selectedValue}  />
-        
+
+        <Grid container className='animate__animated animate__zoomInUp animate__delay-2s' >
+          <Grid item xs={ 12 }>
+            <Box flexDirection='column' display='flex' alignItems='center' justifyContent='center' m={2}>
+                <Box style={{ backgroundColor: "#121212",border:"3px solid #000000", minHeight:"400px", margin: "15rem 0 0 0 ",
+                                top: "50%",left: "50%", borderRadius:'50px', maxWidth:'500px', width:'100%',
+                                display:'flex', justifyContent:'flex-end', alignItems:' center', flexDirection:'column',
+                                boxShadow: '0px 60px 71px -40px rgba(0, 0, 0, 0.4)', padding:'1rem' }} >
+
+                  <MainCard pokemonsApi={pokemonsApi} selectedValue={selectedValue} pokemons={pokemons} 
+                  back={ back } next={ next } setBack={ setBack } setNext={ setNext } />
+
+                </Box>
+            </Box>
+          </Grid>
+        </Grid>
+
       </MainLayout>
     </Box>
   )
 }
 
+export async function getServerSideProps() {
 
+  const { data } = await pokeApi.get<PokemonListResponse>('pokemon-species/?offset=0&limit=800');
+
+  const pokemonsGeneral: SmallPokemon[] = data.results.map( (poke, i) => ({
+    ...poke,
+    id: i + 1,
+    img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${ i + 1 }.png`,
+  }))
+
+  return {
+    props: {
+      pokemonsGeneral
+    }
+  }
+}
+
+export default Home;

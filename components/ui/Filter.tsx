@@ -87,7 +87,7 @@ export default function SimpleDialogDemo({ selectedValue, setSelectedValue }) {
 
 
   const handleDelete = () => {
-    setSelectedValue("")
+    setSelectedValue('')
 };
 
   const handleClickOpen = () => {
@@ -97,8 +97,6 @@ export default function SimpleDialogDemo({ selectedValue, setSelectedValue }) {
   const handleClose = (value: string) => {
     setOpen(false);
     setSelectedValue(value)
-
-    console.log( value )
   };
 
   return (

@@ -1,8 +1,8 @@
 import { Box, CardMedia } from '@mui/material'
 
-export const PokeImage = ({ id, name }) => {
+export const PokeImage = ({ id, name, img }) => {
   return (
-    <Box key={ id } className='mainpokemons'  maxWidth='240px' width='100%' position="absolute" marginBottom="16rem" >
+    <Box className='mainpokemons' maxWidth='240px' width='100%' position="absolute" marginBottom="7rem" >
         <CardMedia
             component="img"
             sx={{ width: "100%", filter: "drop-shadow(0px 10px 10px rgba(0, 0, 0, 0.5))", objectFit:'fill' }}

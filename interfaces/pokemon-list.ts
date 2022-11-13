@@ -36,14 +36,10 @@ export interface SmallPokemon {
   }
   
   export interface IPokemonFiltered {
+    pokemon_species: any;
     name: string;
     id:   number;
     img?:  string;
-    img2?:  string;
-    img3?:  string;
     color?: string;
-    gender?: string;
-    
-    sprites?: any;
-    count?: number;
+    gender_rate?: number;
   }
