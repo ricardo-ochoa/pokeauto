@@ -1,12 +1,13 @@
 import { pokeApi } from '../ApiAxios';
-import { PokemonListResponse } from '../interfaces';
+//import { PokemonListResponse, SmallPokemon } from '../interfaces';
 
 export const fetchPokemons = async (current, setPokemons, setPokemonsApi, setNext, setBack, selectedValue ) => { 
 
-    const { data } = await pokeApi.get<PokemonListResponse>(current);
+    const { data } = await pokeApi.get(current);
+    console.log(data)
 
-    const getPokemonsData = async (url: RequestInfo | URL) => {
-      const { data } = await pokeApi.get<PokemonListResponse>(url);
+    const getPokemonsData = async (url) => {
+      const { data } = await pokeApi.get(url);
       
       const poke = {name: data.name, id: data.id, img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${ data.id }.png` }
       return poke
@@ -14,7 +15,7 @@ export const fetchPokemons = async (current, setPokemons, setPokemonsApi, setNex
 
     if (selectedValue === "") {
 
-      const promises: SmallPokemon[] = data.results.map( (poke, i) => ({
+      const promises = data.results.map( (poke, i) => ({
       ...poke,
       id: i + 1,
       img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${ i + 1 }.png`,
@@ -27,7 +28,7 @@ export const fetchPokemons = async (current, setPokemons, setPokemonsApi, setNex
     } else if ( selectedValue === "female") {
 
 
-      const promises = data.pokemon_species_details.map(async (pokemon: { url: any; }) => {
+      const promises = data.pokemon_species_details.map(async (pokemon) => {
         return await getPokemonsData( pokemon.pokemon_species.url)
       })
 
@@ -37,7 +38,7 @@ export const fetchPokemons = async (current, setPokemons, setPokemonsApi, setNex
 
     } else if ( selectedValue === 'genderless') {
   
-        const promises = data.pokemon_species_details.map(async (pokemon: { url: any; }) => {
+        const promises = data.pokemon_species_details.map(async (pokemon) => {
           return await getPokemonsData( pokemon.pokemon_species.url)
         })
   
@@ -48,7 +49,7 @@ export const fetchPokemons = async (current, setPokemons, setPokemonsApi, setNex
   
     } else if ( selectedValue === 'male') {
 
-      const fetchPromises = data.pokemon_species_details.map(async (pokemon: { url: any; }) => {
+      const fetchPromises = data.pokemon_species_details.map(async (pokemon) => {
 
         return await getPokemonsData( pokemon.pokemon_species.url)
       })
@@ -61,7 +62,7 @@ export const fetchPokemons = async (current, setPokemons, setPokemonsApi, setNex
     } else {
 
 
-        const promises = data.pokemon_species.map(async (pokemon: { url: any; }) => {
+        const promises = data.pokemon_species.map(async (pokemon) => {
           return await getPokemonsData( pokemon.url)
         })
   

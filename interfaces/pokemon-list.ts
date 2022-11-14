@@ -4,6 +4,12 @@ export interface PokemonListResponse {
     next?:     string;
     previous?: string;
     results:   SmallPokemon[];
+    name: string;
+    url:  string;
+    id:   number;
+    img:  string;
+    pokemon_species: IPokemonClean[]
+    pokemon_species_details: IPokemonClean[]
 }
 
 export interface SmallPokemon {
@@ -19,12 +25,7 @@ export interface SmallPokemon {
     name: string;
     id?:   number;
     img?:  string;
-    img2?:  string;
-    img3?:  string;
-    sprites?: any;
-    count?: number;
-    color?: IPokemonColor
-    url?: string;
+    url:  any;
   }
   
   export interface IPokemonColor {
