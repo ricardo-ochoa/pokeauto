@@ -19,8 +19,8 @@ const Home: NextPage<Props> = ({ pokemonsGeneral }) => {
   const [pokemons, setPokemons ] = useState<SmallPokemon[]>( pokemonsGeneral ); 
   const [pokemonsApi, setPokemonsApi ] = useState<number>( pokemons.length );
   
-  const [ selectedValue, setSelectedValue ] = useState("");
-  const [current, setCurrent ] = useState('');
+  const [ selectedValue, setSelectedValue ] = useState<any>("");
+  const [current, setCurrent ] = useState(`https://pokeapi.co/api/v2/pokemon-color/${selectedValue}`);
 
   const [back, setBack ] = useState<number>( 0  );
   const [next, setNext ] = useState<number>( 5 );
@@ -51,39 +51,17 @@ const fetchPokemons = async () => {
 
       setNext( 5 )
       setBack( 0 )
+
+      const promises = data.pokemon_species.map(async (pokemon: { url: any; }) => {
+          return await getPokemonsData( pokemon.url)
+      })
       
-      if ( selectedValue === "" ) {
 
-        const promises = data.results.map( (poke, i) => ({
-          ...poke,
-          id: i + 1,
-          img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${ i + 1 }.png`,
-        }))
-
-        const results = await Promise.all(promises)
-        setPokemons( results )
-        setPokemonsApi( results.length )
-
-      } else if ( selectedValue === 'male' || 'female' || 'genderless' ) {
-
-        const promises = data.pokemon_species_details.map(async (pokemon: { url: any; }) => {
-          return await getPokemonsData( pokemon.url)
-        })
-
-        const results = await Promise.all(promises)
-        setPokemons( results )
-        setPokemonsApi( results.length )
-
-      } else {
-
-        const promises = data.pokemon_species_details.map(async (pokemon: { url: any; }) => {
-          return await getPokemonsData( pokemon.url)
-        })
-
-        const results = await Promise.all(promises)
-        setPokemons( results )
-        setPokemonsApi( results.length )
-      }
+      const results = await Promise.all(promises)
+      setPokemons( results )
+      setPokemonsApi( results.length )
+      console.log( results )
+      
 
     } catch( error ) {}
 }
@@ -91,12 +69,28 @@ const fetchPokemons = async () => {
 
 useEffect(() => {
 
+  if ( selectedValue === 'male' || 'female' || 'genderless' ) {
+  
+    setCurrent(`https://pokeapi.co/api/v2/gender/${selectedValue}`)
+   
+  } else if (selectedValue === "" ) {
+    setPokemons(pokemonsGeneral)
+    setCurrent(`https://pokeapi.co/api/v2/pokemon-species/?offset=0&limit=800`)
+    setPokemonsApi( pokemonsGeneral.length )
+  }
+  else {
+    setCurrent(`https://pokeapi.co/api/v2/pokemon-color/${selectedValue}`)
+  }
+
+
+}, [ selectedValue  ])
+
+useEffect(() => {
   getPokemons()
   fetchPokemons()
+ console.log( selectedValue, current )
 
-  console.log( selectedValue, current )
-
-}, [ selectedValue, current  ])
+}, [ current  ])
 
 
   return (
