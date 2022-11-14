@@ -15,13 +15,14 @@ interface Props {
     next: any;
     setBack: any;
     setNext: any;
+    active:  any;
+    setActive:  any;
 }
 
-export const MainCard: FC<Props> = ({ pokemons, selectedValue, pokemonsApi , back, next, setBack, setNext }) => {
+export const MainCard: FC<Props> = ({ pokemons, selectedValue, pokemonsApi , back, next, setBack, setNext, active, setActive  }) => {
 
     // const [back, setBack ] = useState<number>( 0  );
     // const [next, setNext ] = useState<number>( 5 );
-    const [active, setActive ] = useState( 0 );
 
     const nextPage = () => {
         setNext(next + 5)

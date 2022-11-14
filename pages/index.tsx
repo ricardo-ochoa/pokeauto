@@ -8,7 +8,7 @@ import { IPokemonClean, PokemonListResponse, SmallPokemon } from '../interfaces/
 import 'animate.css';
 import styles from '../styles/Home.module.css'
 import { pokeApi } from '../ApiAxios';
-import { getPokemonInfo } from '../utils/getPokemonInfo';
+import { fetchPokemons } from '../utils/fetchPokemons';
 
 interface Props {
   pokemonsGeneral: SmallPokemon[];
@@ -20,83 +20,35 @@ const Home: NextPage<Props> = ({ pokemonsGeneral }) => {
   const [pokemonsApi, setPokemonsApi ] = useState<number>( pokemons.length );
   
   const [ selectedValue, setSelectedValue ] = useState("");
-  const [current, setCurrent ] = useState('');
+  const [current, setCurrent ] = useState(`pokemon-color/${selectedValue}`);
 
   const [back, setBack ] = useState<number>( 0  );
   const [next, setNext ] = useState<number>( 5 );
 
+  const [active, setActive ] = useState( 0 );
 
-const getPokemons = async () => {
-    try {
-        let url = current
-        const { data } = await pokeApi.get( url );
-
-      return data;
-      
-    } catch(err) {}
-}
-
-const getPokemonsData = async (url: RequestInfo | URL) => {
-    try {
-      const response = await fetch(url);
-      const data = await response.json();
-      
-      return data;
-    } catch( error ){}
-}
-
-const fetchPokemons = async () => {
-    try {
-      const data = await getPokemons();
-
-      setNext( 5 )
-      setBack( 0 )
-      
-      if ( selectedValue === "" ) {
-
-        const promises = data.results.map( (poke, i) => ({
-          ...poke,
-          id: i + 1,
-          img: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/home/${ i + 1 }.png`,
-        }))
-
-        const results = await Promise.all(promises)
-        setPokemons( results )
-        setPokemonsApi( results.length )
-
-      } else if ( selectedValue === 'male' || 'female' || 'genderless' ) {
-
-        const promises = data.pokemon_species_details.map(async (pokemon: { url: any; }) => {
-          return await getPokemonsData( pokemon.url)
-        })
-
-        const results = await Promise.all(promises)
-        setPokemons( results )
-        setPokemonsApi( results.length )
-
-      } else {
-
-        const promises = data.pokemon_species_details.map(async (pokemon: { url: any; }) => {
-          return await getPokemonsData( pokemon.url)
-        })
-
-        const results = await Promise.all(promises)
-        setPokemons( results )
-        setPokemonsApi( results.length )
-      }
-
-    } catch( error ) {}
-}
-
+  
+useEffect(() => {
+  if (selectedValue === "" ) {
+    setPokemons(pokemonsGeneral)
+    setCurrent(`/pokemon-species/?offset=0&limit=800`)
+    setPokemonsApi( pokemonsGeneral.length )
+  } else if (selectedValue === 'female'){
+    setCurrent(`/gender/${selectedValue}`)
+  }else if (selectedValue === 'male'){
+    setCurrent(`/gender/${selectedValue}`)
+  }else if (selectedValue === 'genderless'){
+    setCurrent(`/gender/${selectedValue}`)
+  }
+  else {
+    setCurrent(`/pokemon-color/${selectedValue}`)
+  }
+}, [ selectedValue  ])
 
 useEffect(() => {
-
-  getPokemons()
-  fetchPokemons()
-
-  console.log( selectedValue, current )
-
-}, [ selectedValue, current  ])
+  fetchPokemons(current, setPokemons, setPokemonsApi, setNext, setBack, selectedValue)
+  setActive( 0 )
+}, [ current  ])
 
 
   return (
@@ -115,7 +67,8 @@ useEffect(() => {
                                 boxShadow: '0px 60px 71px -40px rgba(0, 0, 0, 0.4)', padding:'1rem' }} >
 
                   <MainCard pokemonsApi={pokemonsApi} selectedValue={selectedValue} pokemons={pokemons} 
-                  back={ back } next={ next } setBack={ setBack } setNext={ setNext } />
+                  back={ back } next={ next } setBack={ setBack } setNext={ setNext } 
+                  setActive={ setActive } active={ active}/>
 
                 </Box>
             </Box>
